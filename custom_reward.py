@@ -57,6 +57,7 @@ class RLCombinedLogReward(CombinedReward):
         ]
         # Add the rewards to the cumulative totals with numpy broadcasting
         self.returns += [a * b for a, b in zip(rewards, self.reward_weights)]
+        # funny conversion tricks?
         self.returns.tolist()
 
         # Make returns into a numpy array so we can make use of numpy features
