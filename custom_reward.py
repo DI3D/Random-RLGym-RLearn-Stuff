@@ -57,14 +57,15 @@ class RLCombinedLogReward(CombinedReward):
         ]
         # Add the rewards to the cumulative totals with numpy broadcasting
         self.returns += [a * b for a, b in zip(rewards, self.reward_weights)]
+        # self.returns.tolist()
 
         # Make returns into a numpy array so we can make use of numpy features
-        returns = np.array(self.returns)
+        # returns = np.array(self.returns)
         upd_num = self.redis.get(N_UPDATES)
         # Log each reward
         reward_dict = dict()
         for n, names in enumerate(self.reward_names):
-            reward_dict[names] = np.mean(returns[:, n])
+            reward_dict[names] = np.mean(self.returns[:, n])
         self.logger.log(reward_dict, step=upd_num, commit=False)
 
         return float(np.dot(self.reward_weights, rewards))
