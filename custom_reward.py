@@ -57,16 +57,13 @@ class RLCombinedLogReward(CombinedReward):
         ]
         # Add the rewards to the cumulative totals with numpy broadcasting
         self.returns += [a * b for a, b in zip(rewards, self.reward_weights)]
-        # funny conversion tricks?
-        self.returns.tolist()
 
-        # Make returns into a numpy array so we can make use of numpy features
-        returns = np.array(self.returns)
-        upd_num = self.redis.get(N_UPDATES)
+        upd_num = int(self.redis.get(N_UPDATES))
         # Log each reward
         reward_dict = dict()
         for n, names in enumerate(self.reward_names):
-            reward_dict[names] = np.mean(returns[:, n])
+            reward_dict[names] = self.returns[n]
+        # Keep in mind this logs once per episode (usually once per goal scored)
         self.logger.log(reward_dict, step=upd_num, commit=False)
 
         return float(np.dot(self.reward_weights, rewards))
